@@ -1,0 +1,31 @@
+<%- include('../partials/top') %>
+<header class="page-head">
+  <div><p class="kicker">Catálogo interno</p><h1>Artigos e preços</h1></div>
+  <a class="a-btn a-btn--primary" href="/artigos/novo"><%- icon('plus') %> Novo artigo</a>
+</header>
+<p class="lead muted">Base para os orçamentos: cada tipologia traz o desenho, as medidas habituais e o preço sem IVA (por m² ou por unidade). Ao adicionar um vão, o preço é calculado pela área — e pode sempre ser alterado no orçamento.</p>
+<% Object.entries(CATEGORIAS).forEach(([cat, nome]) => { const items = artigos.filter((a) => a.categoria === cat); if (!items.length) return; %>
+<section class="card card--flush">
+  <div class="card__head card__head--pad"><h2><%= nome %></h2></div>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th class="col-thumb"></th><th>Artigo</th><th>Unidade</th><th class="num">Preço s/ IVA</th><th class="col-actions"></th></tr></thead>
+    <tbody>
+    <% items.forEach((a) => { %>
+    <tr class="<%= a.ativo ? '' : 'is-off' %>" data-href="/artigos/<%= a.id %>">
+      <td class="col-thumb"><span class="thumb thumb--draw"><% if (a.imagem) { %><img src="/media/<%= a.imagem %>" alt=""><% } else if (a.tipo === 'vao') { %><%- desenho.svg(a.desenho, 0, 0, { cotas: false, size: 80, maxH: 60 }) %><% } else { %><%- brandIcon(a.categoria === 'servico' ? 'montagem' : 'aluminio') %><% } %></span></td>
+      <td><a class="strong" href="/artigos/<%= a.id %>"><%= a.nome %></a><% if (!a.ativo) { %> <span class="tag">Inativo</span><% } %><span class="block small muted"><%= a.tipo === 'vao' ? desenho.descrever(a.desenho) : (a.descricao || '') %></span></td>
+      <td class="muted"><%= UNIDADES[a.unidade] %><% if (a.unidade === 'm2' && a.area_minima) { %><span class="block small">mín. <%= u.num(a.area_minima) %> m²</span><% } %></td>
+      <td class="num strong-num"><%= u.eur(a.preco) %><%= a.unidade === 'm2' ? '/m²' : '' %></td>
+      <td class="col-actions">
+        <form method="post" action="/artigos/<%= a.id %>/mover"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="icon-btn" name="dir" value="up" aria-label="Subir"><%- icon('up') %></button><button class="icon-btn" name="dir" value="down" aria-label="Descer"><%- icon('down') %></button></form>
+        <a class="icon-btn" href="/artigos/<%= a.id %>" aria-label="Editar"><%- icon('edit') %></a>
+      </td>
+    </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  </div>
+</section>
+<% }) %>
+<%- include('../partials/bottom') %>

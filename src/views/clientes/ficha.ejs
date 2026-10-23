@@ -1,0 +1,36 @@
+<%- include('../partials/top') %>
+<% const c = cliente; const morada = [c.morada, [c.codigo_postal, c.localidade].filter(Boolean).join(' ')].filter(Boolean).join(', '); %>
+<header class="page-head">
+  <div><p class="kicker"><a href="/clientes"><%- icon('arrowLeft', 'icon--sm') %> Clientes</a></p><h1><%= c.nome %></h1></div>
+  <div class="head-actions">
+    <a class="a-btn" href="/clientes/<%= c.id %>/editar"><%- icon('edit') %> Editar</a>
+    <form method="post" action="/orcamentos/novo"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="cliente_id" value="<%= c.id %>"><button class="a-btn a-btn--primary" type="submit"><%- icon('plus') %> Novo orçamento</button></form>
+  </div>
+</header>
+<% if (c.arquivado) { %><div class="alert alert--warn">Cliente arquivado: não aparece nas pesquisas.</div><% } %>
+<div class="form-grid">
+  <section class="card card--flush">
+    <div class="card__head card__head--pad"><h2>Orçamentos</h2></div>
+    <% if (!orcs.length) { %><p class="empty">Ainda sem orçamentos.</p><% } else { %><%- include('../orcamentos/_tabela', { orcs }) %><% } %>
+  </section>
+  <aside class="form-side">
+    <section class="card">
+      <dl class="meta meta--stack">
+        <div><dt>Tipo</dt><dd><%= c.tipo === 'empresa' ? 'Empresa' : 'Particular' %></dd></div>
+        <% if (c.contacto_nome) { %><div><dt>Contacto</dt><dd><%= c.contacto_nome %></dd></div><% } %>
+        <% if (c.nif) { %><div><dt>NIF</dt><dd><%= c.nif %></dd></div><% } %>
+        <% if (c.telemovel) { %><div><dt>Telemóvel</dt><dd><a href="tel:<%= c.telemovel.replace(/\s/g, '') %>"><%= c.telemovel %></a></dd></div><% } %>
+        <% if (c.telefone) { %><div><dt>Telefone</dt><dd><a href="tel:<%= c.telefone.replace(/\s/g, '') %>"><%= c.telefone %></a></dd></div><% } %>
+        <% if (c.whatsapp) { %><div><dt>WhatsApp</dt><dd><%= c.whatsapp %></dd></div><% } %>
+        <% if (c.email) { %><div><dt>Email</dt><dd><a href="mailto:<%= c.email %>"><%= c.email %></a></dd></div><% } %>
+        <% if (morada) { %><div><dt>Morada</dt><dd><%= morada %></dd></div><% } %>
+      </dl>
+      <% if (c.notas) { %><h3 class="card__title mt-16">Notas</h3><p class="pre"><%= c.notas %></p><% } %>
+      <div class="row-actions">
+        <form method="post" action="/clientes/<%= c.id %>/arquivar"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="arquivar" value="<%= c.arquivado ? 0 : 1 %>"><button class="a-btn a-btn--sm" type="submit"><%= c.arquivado ? 'Repor' : 'Arquivar' %></button></form>
+        <% if (!orcs.length) { %><form method="post" action="/clientes/<%= c.id %>/apagar" data-confirm="Apagar este cliente?"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="a-btn a-btn--sm a-btn--danger" type="submit"><%- icon('trash') %> Apagar</button></form><% } %>
+      </div>
+    </section>
+  </aside>
+</div>
+<%- include('../partials/bottom') %>

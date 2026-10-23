@@ -1,0 +1,28 @@
+{
+  "name": "nuno-aluminios-orcamentos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicação de orçamentos da Nuno Alumínios, Unipessoal Lda..",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js",
+    "reset-admin": "node scripts/reset-admin.js",
+    "dev:local": "node --env-file=.env.dev --watch src/server.js",
+    "exemplos": "node scripts/exemplos.js",
+    "exemplos:local": "node --env-file=.env.dev scripts/exemplos.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "ejs": "^3.1.10",
+    "express": "^4.22.3",
+    "multer": "^2.5.0",
+    "pdfkit": "^0.20.2",
+    "svg-to-pdfkit": "^0.1.8"
+  }
+}

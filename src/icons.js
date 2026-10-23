@@ -1,0 +1,81 @@
+'use strict';
+
+// Ícones SVG. Os ícones de marca seguem o manual: traço de 2 px numa grelha de 64 px.
+// Os ícones de interface usam uma grelha de 24 px com traço de 1.5 px.
+
+const BRAND = {
+  janela: 'M8 4H56V60H8Z M32 4V60 M8 32H56 M26 29V36 M38 29V36',
+  porta: 'M14 60V4H50V60 M41 33V39',
+  medicao: 'M5 18H59V46H5Z M13 18V30 M22 18V27 M31 18V30 M40 18V27 M49 18V30',
+  projeto: 'M12 4H42L54 16V60H12Z M42 4V16H54 M21 29H45 M21 39H45 M21 49H37',
+  envidracado: 'M4 10H60 M4 54H60 M8 10V54 M22 10V54 M36 10V54 M50 10V54 M56 10V54 M27 26L31 22 M27 32L35 24 M41 26L45 22',
+  fabrico: 'M10 10H30V20H20V54H10Z M34 10H54V54H44V20H34Z M20 30H44',
+  // Montagem: janela de duas folhas já colocada no vão, com puxadores e peitoril.
+  montagem: 'M12 6H52V52H12Z M32 6V52 M27 26V34 M37 26V34 M6 58H58',
+  aluminio: 'M12 8H52V18H22V46H52V56H12Z M30 26H52V38H30Z',
+};
+
+const UI = {
+  arrow: 'M4 12H20 M14 6L20 12L14 18',
+  arrowRight: 'M4 12H20 M14 6L20 12L14 18',
+  arrowLeft: 'M20 12H4 M10 6L4 12L10 18',
+  chevronLeft: 'M15 5L8 12L15 19',
+  chevronRight: 'M9 5L16 12L9 19',
+  chevronDown: 'M5 9L12 16L19 9',
+  menu: 'M3 8H21 M9 16H21',
+  close: 'M5 5L19 19 M19 5L5 19',
+  phone: 'M5 3H9L11 8L8.5 9.5C9.6 11.8 12.2 14.4 14.5 15.5L16 13L21 15V19C21 20.1 20.1 21 19 21C10.2 21 3 13.8 3 5C3 3.9 3.9 3 5 3Z',
+  mobile: 'M7 2H17V22H7Z M11 18H13',
+  mail: 'M3 5H21V19H3Z M3 6L12 13L21 6',
+  pin: 'M12 22C12 22 19 15.5 19 9.5C19 5.4 15.9 2.5 12 2.5C8.1 2.5 5 5.4 5 9.5C5 15.5 12 22 12 22Z M12 12A2.5 2.5 0 1 0 12 7A2.5 2.5 0 1 0 12 12Z',
+  clock: 'M12 21A9 9 0 1 0 12 3A9 9 0 1 0 12 21Z M12 7V12L15.5 14',
+  book: 'M4 4H10C11.1 4 12 4.9 12 6V20C12 19 11.1 18 10 18H4Z M20 4H14C12.9 4 12 4.9 12 6V20C12 19 12.9 18 14 18H20Z',
+  external: 'M14 4H20V10 M20 4L11 13 M18 14V20H4V6H10',
+  check: 'M4 12.5L9.5 18L20 6',
+  plus: 'M12 4V20 M4 12H20',
+  trash: 'M4 7H20 M9 7V4H15V7 M6 7L7 21H17L18 7 M10 11V17 M14 11V17',
+  edit: 'M4 20H8L19 9L15 5L4 16Z M13 7L17 11',
+  eye: 'M2 12C4.5 7 8 5 12 5C16 5 19.5 7 22 12C19.5 17 16 19 12 19C8 19 4.5 17 2 12Z M12 15A3 3 0 1 0 12 9A3 3 0 1 0 12 15Z',
+  eyeOff: 'M3 3L21 21 M10.6 6.1C11 6 11.5 6 12 6C16 6 19.5 8 22 12C21.3 13.4 20.5 14.6 19.5 15.6 M6.5 6.6C4.7 7.8 3.2 9.6 2 12C4.5 17 8 19 12 19C13.7 19 15.3 18.6 16.7 17.8 M9.9 9.9A3 3 0 0 0 14.1 14.1',
+  logout: 'M15 4H20V20H15 M10 8L6 12L10 16 M6 12H16',
+  image: 'M3 5H21V19H3Z M3 16L8.5 11L13 15.5L16 12.5L21 17 M15.5 9.5A1.5 1.5 0 1 0 15.5 6.5A1.5 1.5 0 1 0 15.5 9.5Z',
+  upload: 'M12 16V4 M7 9L12 4L17 9 M4 15V20H20V15',
+  grid: 'M4 4H10V10H4Z M14 4H20V10H14Z M4 14H10V20H4Z M14 14H20V20H14Z',
+  inbox: 'M3 13H8L10 16H14L16 13H21 M3 13L6 4H18L21 13V20H3Z',
+  settings: 'M4 7H14 M18 7H20 M4 17H8 M12 17H20 M14 5V9H18V5Z M8 15V19H12V15Z',
+  folder: 'M3 6H10L12 8H21V19H3Z',
+  globe: 'M12 21A9 9 0 1 0 12 3A9 9 0 1 0 12 21Z M3 12H21 M12 3C14.5 5.5 15.5 8.5 15.5 12C15.5 15.5 14.5 18.5 12 21C9.5 18.5 8.5 15.5 8.5 12C8.5 8.5 9.5 5.5 12 3Z',
+  star: 'M12 3L14.8 8.6L21 9.5L16.5 13.8L17.6 20L12 17L6.4 20L7.5 13.8L3 9.5L9.2 8.6Z',
+  up: 'M12 19V5 M6 11L12 5L18 11',
+  down: 'M12 5V19 M6 13L12 19L18 13',
+  facebook: 'M14 8H16.5V4.5H14C11.5 4.5 10 6.2 10 8.6V11H7.5V14.5H10V21H13.5V14.5H16L16.5 11H13.5V9C13.5 8.4 13.8 8 14 8Z',
+  users: 'M9 11A3.5 3.5 0 1 0 9 4A3.5 3.5 0 1 0 9 11Z M2.5 20C2.5 16.4 5.4 14 9 14C12.6 14 15.5 16.4 15.5 20 M16 4.3A3.5 3.5 0 0 1 16 11 M18 14.3C20.1 15 21.5 17.2 21.5 20',
+  file: 'M6 3H14L19 8V21H6Z M14 3V8H19 M9 13H16 M9 17H14',
+  whatsapp: 'M4 20L5.3 16.2C4.5 14.9 4 13.5 4 12C4 7.6 7.6 4 12 4C16.4 4 20 7.6 20 12C20 16.4 16.4 20 12 20C10.5 20 9.1 19.6 7.9 18.8Z M9.2 8.6C9 9.9 10 12 11.3 13.1C12.6 14.2 14.4 15 15.4 14.8L16 13.6L14.3 12.8L13.5 13.6C12.6 13.2 11.6 12.2 11.2 11.3L12 10.5L11.2 8.8Z',
+  send: 'M21 3L10 14 M21 3L14.5 21L10 14L3 9.5Z',
+  copy: 'M8 8H20V20H8Z M16 8V4H4V16H8',
+  download: 'M12 4V16 M7 11L12 16L17 11 M4 20H20',
+  link: 'M10 14L14 10 M8.5 11.5L6 14C4.6 15.4 4.6 17.6 6 19C7.4 20.4 9.6 20.4 11 19L13.5 16.5 M15.5 12.5L18 10C19.4 8.6 19.4 6.4 18 5C16.6 3.6 14.4 3.6 13 5L10.5 7.5',
+  search: 'M11 18A7 7 0 1 0 11 4A7 7 0 1 0 11 18Z M16 16L21 21',
+  duplicate: 'M8 8H20V20H8Z M16 8V4H4V16H8 M14 11V17 M11 14H17',
+  drag: 'M9 6H9.01 M15 6H15.01 M9 12H9.01 M15 12H15.01 M9 18H9.01 M15 18H15.01',
+  calc: 'M6 3H18V21H6Z M9 7H15 M9 11H9.01 M12 11H12.01 M15 11H15.01 M9 15H9.01 M12 15H12.01 M15 15H15.01 M9 18H9.01 M12 18H15',
+  section: 'M4 6H20 M4 12H14 M4 18H10',
+  text: 'M5 6H19 M12 6V19 M9 19H15',
+  box: 'M4 7L12 3L20 7V17L12 21L4 17Z M4 7L12 11L20 7 M12 11V21',
+  instagram: 'M7 3H17C19.2 3 21 4.8 21 7V17C21 19.2 19.2 21 17 21H7C4.8 21 3 19.2 3 17V7C3 4.8 4.8 3 7 3Z M12 16A4 4 0 1 0 12 8A4 4 0 1 0 12 16Z M17.3 6.7H17.31',
+};
+
+function brandIcon(name, cls = '') {
+  const d = BRAND[name] || BRAND.janela;
+  return `<svg class="icon-brand ${cls}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
+}
+
+function icon(name, cls = '') {
+  const d = UI[name] || UI.arrow;
+  return `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+const BRAND_ICON_NAMES = ['janela', 'porta', 'envidracado', 'medicao', 'projeto', 'fabrico', 'montagem'];
+
+module.exports = { brandIcon, icon, BRAND_ICON_NAMES, BRAND };

@@ -1,0 +1,32 @@
+<%- include('../partials/top') %>
+<header class="page-head">
+  <div><p class="kicker"><a href="/orcamentos"><%- icon('arrowLeft', 'icon--sm') %> Orçamentos</a></p><h1>Novo orçamento</h1></div>
+</header>
+<form method="post" action="/orcamentos/novo" class="form-grid form-grid--even" data-novo>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <section class="card">
+    <h2 class="card__title">1 · Cliente</h2>
+    <div class="picker" data-cliente-picker>
+      <input type="hidden" name="cliente_id" value="">
+      <label class="f"><span>Procurar cliente</span>
+        <span class="search search--field"><%- icon('search') %><input type="search" autocomplete="off" placeholder="Nome, NIF ou telefone" data-picker-input autofocus></span>
+      </label>
+      <ul class="picker__list" data-picker-list hidden></ul>
+      <p class="picker__chosen" data-picker-chosen hidden></p>
+    </div>
+    <% if (recentes.length) { %>
+    <p class="small muted mt-8">Recentes</p>
+    <div class="chips">
+      <% recentes.forEach((c) => { %><button type="button" class="chip" data-pick-id="<%= c.id %>" data-pick-nome="<%= c.nome %>"><%= c.nome %></button><% }) %>
+    </div>
+    <% } %>
+    <p class="mt-16"><a class="a-btn a-btn--sm" href="/clientes/novo" data-novo-cliente><%- icon('plus') %> Cliente novo</a> <span class="small muted">ou continue sem cliente e preencha os dados no orçamento.</span></p>
+  </section>
+  <section class="card">
+    <h2 class="card__title">2 · Obra</h2>
+    <label class="f"><span>Assunto</span><input name="titulo" maxlength="200" placeholder="Ex.: Substituição de caixilharia"></label>
+    <label class="f"><span>Local da obra</span><input name="obra_local" maxlength="300" placeholder="Ex.: Moradia em Arcozelo, Ponte de Lima"></label>
+    <button class="a-btn a-btn--primary a-btn--block" type="submit"><%- icon('arrowRight') %> Criar e abrir editor</button>
+  </section>
+</form>
+<%- include('../partials/bottom') %>

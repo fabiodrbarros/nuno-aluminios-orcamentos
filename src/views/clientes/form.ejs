@@ -1,0 +1,50 @@
+<%- include('../partials/top') %>
+<% const c = cliente; const err = (k) => erros[k] ? `<em>${erros[k]}</em>` : ''; %>
+<header class="page-head">
+  <div><p class="kicker"><a href="<%= c.id ? '/clientes/' + c.id : '/clientes' %>"><%- icon('arrowLeft', 'icon--sm') %> <%= c.id ? c.nome : 'Clientes' %></a></p><h1><%= c.id ? 'Editar cliente' : 'Novo cliente' %></h1></div>
+</header>
+<form method="post" action="<%= c.id ? '/clientes/' + c.id + '/editar' : '/clientes/novo' %>" class="form-grid">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input type="hidden" name="voltar" value="<%= voltar %>">
+  <div>
+    <section class="card">
+      <h2 class="card__title">Identificação</h2>
+      <fieldset class="f seg">
+        <legend class="sr-only">Tipo</legend>
+        <label><input type="radio" name="tipo" value="particular" <%= c.tipo !== 'empresa' ? 'checked' : '' %>><span>Particular</span></label>
+        <label><input type="radio" name="tipo" value="empresa" <%= c.tipo === 'empresa' ? 'checked' : '' %>><span>Empresa</span></label>
+      </fieldset>
+      <div class="grid-2">
+        <label class="f <%= erros.nome ? 'has-error' : '' %>"><span>Nome *</span><input name="nome" value="<%= c.nome || '' %>" required autofocus maxlength="200"><%- err('nome') %></label>
+        <label class="f <%= erros.nif ? 'has-error' : '' %>"><span>NIF</span><input name="nif" value="<%= c.nif || '' %>" inputmode="numeric" maxlength="40"><%- err('nif') %></label>
+      </div>
+      <label class="f" data-show-empresa><span>Pessoa de contacto <small>(empresas)</small></span><input name="contacto_nome" value="<%= c.contacto_nome || '' %>" maxlength="200"></label>
+    </section>
+    <section class="card">
+      <h2 class="card__title">Contactos</h2>
+      <div class="grid-2">
+        <label class="f"><span>Telemóvel</span><input name="telemovel" type="tel" value="<%= c.telemovel || '' %>" maxlength="60" placeholder="912 345 678"></label>
+        <label class="f"><span>Telefone</span><input name="telefone" type="tel" value="<%= c.telefone || '' %>" maxlength="60"></label>
+        <label class="f <%= erros.email ? 'has-error' : '' %>"><span>Email</span><input name="email" type="email" value="<%= c.email || '' %>" maxlength="200"><%- err('email') %></label>
+        <label class="f <%= erros.whatsapp ? 'has-error' : '' %>"><span>WhatsApp <small>(se diferente do telemóvel)</small></span><input name="whatsapp" type="tel" value="<%= c.whatsapp || '' %>" maxlength="60" placeholder="+351 …"><%- err('whatsapp') %></label>
+      </div>
+    </section>
+    <section class="card">
+      <h2 class="card__title">Morada</h2>
+      <label class="f"><span>Morada</span><input name="morada" value="<%= c.morada || '' %>" maxlength="300"></label>
+      <div class="grid-2">
+        <label class="f"><span>Código postal</span><input name="codigo_postal" value="<%= c.codigo_postal || '' %>" maxlength="20" placeholder="4990-000"></label>
+        <label class="f"><span>Localidade</span><input name="localidade" value="<%= c.localidade || '' %>" maxlength="120"></label>
+      </div>
+    </section>
+  </div>
+  <aside class="form-side">
+    <section class="card">
+      <h2 class="card__title">Notas internas</h2>
+      <label class="f"><span class="sr-only">Notas</span><textarea name="notas" rows="7" placeholder="Não aparecem no orçamento."><%= c.notas || '' %></textarea></label>
+      <button class="a-btn a-btn--primary a-btn--block" type="submit"><%- icon('check') %> Guardar</button>
+      <% if (!c.id) { %><button class="a-btn a-btn--block mt-8" type="submit" name="depois" value="orcamento"><%- icon('file') %> Guardar e criar orçamento</button><% } %>
+    </section>
+  </aside>
+</form>
+<%- include('../partials/bottom') %>

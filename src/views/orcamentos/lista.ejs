@@ -1,0 +1,20 @@
+<%- include('../partials/top') %>
+<header class="page-head">
+  <div><p class="kicker">Propostas</p><h1>Orçamentos</h1></div>
+  <a class="a-btn a-btn--primary" href="/orcamentos/novo"><%- icon('plus') %> Novo orçamento</a>
+</header>
+<form class="toolbar" method="get" action="/orcamentos" role="search">
+  <label class="search"><%- icon('search') %><span class="sr-only">Pesquisar</span><input type="search" name="q" value="<%= q %>" placeholder="Número, cliente, obra"></label>
+  <% if (estado) { %><input type="hidden" name="estado" value="<%= estado %>"><% } %>
+  <nav class="filters" aria-label="Estado">
+    <% [['', 'Todos'], ...Object.entries(calculo.ESTADOS)].forEach(([k, v]) => { %>
+    <a href="/orcamentos?<%= new URLSearchParams(Object.assign({}, k ? { estado: k } : {}, q ? { q } : {})).toString() %>"<% if (estado === k) { %> aria-current="page"<% } %>><%= v %></a>
+    <% }) %>
+  </nav>
+</form>
+<section class="card card--flush">
+  <% if (!orcs.length) { %><p class="empty">Nenhum orçamento<%= q || estado ? ' com estes filtros' : '' %>. <a href="/orcamentos/novo">Criar orçamento</a></p><% } else { %>
+  <%- include('_tabela', { orcs }) %>
+  <% } %>
+</section>
+<%- include('../partials/bottom') %>

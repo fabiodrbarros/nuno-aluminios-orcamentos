@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title><%= title %> · Orçamentos NUNO Alumínios</title>
+<link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="<%= asset('css/app.css') %>">
+</head>
+<body class="admin" data-csrf="<%= csrf %>">
+<a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
+<header class="admin-mobilebar">
+  <a href="/" aria-label="Orçamentos · NUNO Alumínios"><img src="/static/brand/nuno-simbolo-branco.svg" alt="" width="40" height="48"></a>
+  <a class="admin-mobilebar__novo" href="/orcamentos/novo"><%- icon('plus') %><span>Novo orçamento</span></a>
+  <form method="post" action="/sair" class="admin-mobilebar__out"><input type="hidden" name="_csrf" value="<%= csrf %>"><button type="submit" aria-label="Sair"><%- icon('logout') %></button></form>
+</header>
+<div class="admin-shell">
+  <aside class="admin-side">
+    <a class="admin-side__brand" href="/" aria-label="Orçamentos · NUNO Alumínios"><img src="/static/brand/nuno-wordmark-branco.svg" alt="" width="636" height="197"></a>
+    <p class="admin-side__app">Orçamentos</p>
+    <nav class="admin-nav" aria-label="Aplicação">
+      <% const items = [['/', 'grid', 'Painel'], ['/orcamentos', 'file', 'Orçamentos'], ['/clientes', 'users', 'Clientes'], ['/artigos', 'box', 'Artigos'], ['/definicoes', 'settings', 'Definições']]; %>
+      <% items.forEach(([href, ic, label]) => { const active = href === '/' ? reqPath === '/' : reqPath.startsWith(href); %>
+      <a href="<%= href %>"<% if (active) { %> aria-current="page"<% } %>><%- icon(ic) %><span><%= label %></span></a>
+      <% }) %>
+    </nav>
+    <div class="admin-side__foot">
+      <form method="post" action="/sair"><input type="hidden" name="_csrf" value="<%= csrf %>"><button type="submit"><%- icon('logout') %><span>Sair</span></button></form>
+      <p class="admin-side__user"><%= user.email %></p>
+    </div>
+  </aside>
+  <main class="admin-main" id="conteudo">
+    <% if (flash) { %><div class="toast toast--<%= flash.type %>" role="status" data-toast><%- icon(flash.type === 'error' ? 'close' : 'check') %><span><%= flash.msg %></span></div><% } %>

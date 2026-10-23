@@ -1,0 +1,4 @@
+<% if (user) { %><%- include('partials/top') %><% } else { %><!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><%= title %></title><link rel="stylesheet" href="<%= asset('css/app.css') %>"></head><body class="admin"><main class="admin-main"><% } %>
+<header class="page-head"><div><p class="kicker">Aviso</p><h1><%= title %></h1></div></header>
+<section class="card"><p><%= mensagem %></p><p class="row-actions"><a class="a-btn" href="/"><%- icon('arrowLeft') %> Voltar ao início</a></p></section>
+<% if (user) { %><%- include('partials/bottom') %><% } else { %></main></body></html><% } %>

@@ -1,0 +1,37 @@
+<%- include('../partials/top') %>
+<header class="page-head">
+  <div><p class="kicker">Base de dados</p><h1>Clientes</h1></div>
+  <div class="head-actions">
+    <a class="a-btn" href="/clientes/exportar.csv"><%- icon('download') %> Exportar CSV</a>
+    <a class="a-btn a-btn--primary" href="/clientes/novo"><%- icon('plus') %> Novo cliente</a>
+  </div>
+</header>
+<form class="toolbar" method="get" action="/clientes" role="search">
+  <label class="search"><%- icon('search') %><span class="sr-only">Pesquisar</span><input type="search" name="q" value="<%= q %>" placeholder="Nome, NIF, email, telefone ou localidade"></label>
+  <% if (arquivados) { %><input type="hidden" name="arquivados" value="1"><% } %>
+  <nav class="filters" aria-label="Filtro">
+    <a href="/clientes<%= q ? '?q=' + encodeURIComponent(q) : '' %>"<% if (!arquivados) { %> aria-current="page"<% } %>>Ativos</a>
+    <a href="/clientes?arquivados=1<%= q ? '&q=' + encodeURIComponent(q) : '' %>"<% if (arquivados) { %> aria-current="page"<% } %>>Arquivados</a>
+  </nav>
+</form>
+<section class="card card--flush">
+  <% if (!clientes.length) { %><p class="empty"><%= q ? 'Nenhum cliente encontrado.' : 'Ainda não há clientes.' %> <a href="/clientes/novo<%= q ? '?nome=' + encodeURIComponent(q) : '' %>">Criar cliente</a></p><% } else { %>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Nome</th><th>Contacto</th><th>Localidade</th><th>NIF</th><th class="num">Orçamentos</th></tr></thead>
+    <tbody>
+    <% clientes.forEach((c) => { %>
+    <tr data-href="/clientes/<%= c.id %>">
+      <td><a class="strong" href="/clientes/<%= c.id %>"><%= c.nome %></a><% if (c.tipo === 'empresa') { %> <span class="tag">Empresa</span><% } %></td>
+      <td class="muted"><%= c.telemovel || c.telefone || '' %><%= (c.telemovel || c.telefone) && c.email ? ' · ' : '' %><%= c.email %></td>
+      <td class="muted"><%= c.localidade || '—' %></td>
+      <td class="muted"><%= c.nif || '—' %></td>
+      <td class="num"><%= c.n_orc %><% if (c.ultimo) { %> <span class="small muted">· <%= u.dataPt(c.ultimo) %></span><% } %></td>
+    </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  </div>
+  <% } %>
+</section>
+<%- include('../partials/bottom') %>

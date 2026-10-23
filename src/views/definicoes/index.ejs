@@ -1,0 +1,73 @@
+<%- include('../partials/top') %>
+<% const s = settings; const inp = (k, label, extra = '') => `<label class="f"><span>${label}</span><input name="${k}" value="${(s[k] || '').replace(/"/g, '&quot;')}" ${extra}></label>`;
+   const ta = (k, label, rows = 2, hint = '') => `<label class="f"><span>${label}${hint ? ` <small>${hint}</small>` : ''}</span><textarea name="${k}" rows="${rows}">${(s[k] || '').replace(/</g, '&lt;')}</textarea></label>`; %>
+<header class="page-head">
+  <div><p class="kicker">Configuração</p><h1>Definições</h1></div>
+  <a class="a-btn" href="/definicoes/whatsapp"><%- icon('whatsapp') %> WhatsApp</a>
+</header>
+<nav class="filters" aria-label="Secções">
+  <a href="#empresa">Empresa</a><a href="#documento">Documento</a><a href="#listas">Listas</a><a href="#envio">Envio</a><a href="#ligacoes">Ligações</a>
+</nav>
+
+<form method="post" action="/definicoes" class="card" id="empresa">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="secao" value="empresa">
+  <div class="card__head"><h2>Empresa</h2></div>
+  <p class="small muted">Aparecem no cabeçalho e rodapé do PDF.</p>
+  <div class="grid-2">
+    <%- inp('company_name', 'Nome da empresa') %><%- inp('nif', 'NIF') %>
+    <%- inp('address_line1', 'Morada') %><%- inp('address_line2', 'Localidade') %>
+    <%- inp('postal_code', 'Código postal e localidade') %><%- inp('responsavel', 'Responsável pelos orçamentos') %>
+    <%- inp('phone', 'Telefone') %><%- inp('mobile', 'Telemóvel') %>
+    <%- inp('email', 'Email', 'type="email"') %>
+  </div>
+  <%- inp('iban', 'IBAN (opcional, aparece nas condições)') %>
+  <button class="a-btn a-btn--primary" type="submit"><%- icon('check') %> Guardar</button>
+</form>
+
+<form method="post" action="/definicoes" class="card" id="documento">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="secao" value="documento">
+  <div class="card__head"><h2>Documento — valores por omissão</h2></div>
+  <p class="small muted">Copiados para cada orçamento novo; em cada orçamento podem ser alterados.</p>
+  <div class="grid-3">
+    <%- inp('numero_prefixo', 'Prefixo da numeração', 'maxlength="10" placeholder="ORC"') %>
+    <%- inp('validade_dias', 'Validade (dias)', 'inputmode="numeric"') %>
+    <%- inp('iva_taxa', 'IVA por omissão (%)', 'inputmode="decimal"') %>
+  </div>
+  <%- ta('introducao', 'Introdução') %>
+  <div class="grid-2">
+    <%- ta('cond_prazo', 'Prazo de execução') %><%- ta('cond_pagamento', 'Pagamento') %>
+    <%- ta('cond_incluido', 'Incluído') %><%- ta('cond_excluido', 'Não incluído') %>
+  </div>
+  <%- inp('cond_garantia', 'Garantia') %>
+  <%- ta('observacoes', 'Observações', 3) %>
+  <button class="a-btn a-btn--primary" type="submit"><%- icon('check') %> Guardar</button>
+</form>
+
+<form method="post" action="/definicoes" class="card" id="listas">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="secao" value="listas">
+  <div class="card__head"><h2>Listas de sugestões</h2></div>
+  <p class="small muted">Uma opção por linha. Aparecem como sugestões no editor (pode sempre escrever outro valor).</p>
+  <div class="grid-2">
+    <%- ta('lista_series', 'Sistemas / séries', 6) %><%- ta('lista_cores', 'Cores e acabamentos', 6) %>
+    <%- ta('lista_vidros', 'Vidros', 6) %><%- ta('lista_iva_motivos', 'Menções de IVA (isenção, autoliquidação)', 6) %>
+  </div>
+  <button class="a-btn a-btn--primary" type="submit"><%- icon('check') %> Guardar</button>
+</form>
+
+<form method="post" action="/definicoes" class="card" id="envio">
+  <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="secao" value="envio">
+  <div class="card__head"><h2>Mensagem de envio</h2></div>
+  <%- ta('whatsapp_mensagem', 'Texto da mensagem (WhatsApp e email)', 6) %>
+  <p class="small muted">Campos: <code>{{saudacao}}</code> (primeiro nome, só particulares) <code>{{cliente}}</code> <code>{{numero}}</code> <code>{{obra}}</code> <code>{{titulo}}</code> <code>{{total}}</code> <code>{{validade}}</code> <code>{{link}}</code>. Texto entre *asteriscos* fica a negrito no WhatsApp.</p>
+  <label class="switch"><input type="checkbox" name="whatsapp_anexar_pdf" value="1" <%= s.whatsapp_anexar_pdf === '1' ? 'checked' : '' %>><span></span>Anexar o PDF no envio automático (ponte WhatsApp)</label>
+  <button class="a-btn a-btn--primary" type="submit"><%- icon('check') %> Guardar</button>
+</form>
+
+<section class="card" id="ligacoes">
+  <div class="card__head"><h2>Ligações</h2></div>
+  <dl class="meta meta--stack">
+    <div><dt>Endereço público (links para clientes)</dt><dd><%= publicUrl || 'Não definido — defina PUBLIC_URL' %></dd></div>
+    <div><dt>WhatsApp</dt><dd><%= waOn ? 'Ponte WAHA configurada' : 'Envio manual (sem ponte)' %> · <a href="/definicoes/whatsapp">ver</a></dd></div>
+  </dl>
+</section>
+<%- include('../partials/bottom') %>

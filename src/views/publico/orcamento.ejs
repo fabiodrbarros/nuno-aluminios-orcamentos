@@ -1,0 +1,98 @@
+<%- include('_head') %>
+<% const D = desenho; const s = settings; %>
+<main class="pub-wrap">
+  <% if (preview) { %><div class="alert alert--info">Pré-visualização interna (com sessão iniciada). <a href="/orcamentos/<%= orc.id %>">Voltar ao editor</a></div><% } %>
+  <header class="pub-head">
+    <img class="pub-logo" src="/static/brand/nuno-horizontal-claro.svg" alt="NUNO Alumínios" width="1048" height="328">
+    <div class="pub-head__doc"><p class="kicker">Orçamento</p><p class="pub-num"><%= orc.numero %></p></div>
+  </header>
+  <% if (ok) { %><div class="pub-banner pub-banner--ok"><%- icon('check') %> Obrigado! A sua aceitação foi registada. Entraremos em contacto para agendar os próximos passos.</div>
+  <% } else if (estado === 'aceite') { %><div class="pub-banner pub-banner--ok"><%- icon('check') %> Proposta aceite<%= orc.aceite_nome ? ' por ' + orc.aceite_nome : '' %> em <%= u.dataPt(orc.aceite_em) %>.</div>
+  <% } else if (estado === 'expirado') { %><div class="pub-banner pub-banner--warn">A validade desta proposta terminou em <%= u.dataPt(validade) %>. Contacte-nos para a atualizar.</div>
+  <% } else if (estado === 'recusado') { %><div class="pub-banner">Esta proposta foi encerrada.</div><% } %>
+
+  <section class="pub-meta">
+    <div><span class="kicker">Cliente</span><strong><%= orc.cliente_nome || '—' %></strong><% if (orc.cliente_morada) { %><span><%= orc.cliente_morada %></span><% } %></div>
+    <% if (orc.titulo || orc.obra_local) { %><div><span class="kicker">Obra</span><strong><%= orc.titulo || orc.obra_local %></strong><% if (orc.titulo && orc.obra_local) { %><span><%= orc.obra_local %></span><% } %></div><% } %>
+    <div><span class="kicker">Data</span><strong><%= u.dataPt(orc.data) %></strong><span>Válido até <%= u.dataPt(validade) %></span></div>
+  </section>
+  <% if (orc.introducao) { %><p class="pub-intro"><%= orc.introducao %></p><% } %>
+
+  <section class="pub-items">
+    <% linhas.forEach((l) => { const tit = [l.referencia, l.descricao].filter(Boolean).join(' · '); %>
+      <% if (l.tipo === 'secao') { %><h2 class="pub-sec"><%= l.descricao %></h2>
+      <% } else if (l.tipo === 'texto') { %><p class="pub-note"><%= [l.descricao, l.detalhe].filter(Boolean).join(' — ') %></p>
+      <% } else { %>
+      <article class="pub-item <%= l.tipo === 'vao' ? 'pub-item--vao' : '' %>">
+        <% if (l.tipo === 'vao') { %><div class="pub-item__draw"><%- D.svg(l.desenho, l.largura, l.altura) %><% if (l.imagem) { %><img src="/media/<%= l.imagem %>" alt="" loading="lazy"><% } %></div>
+        <% } else if (l.imagem) { %><div class="pub-item__draw pub-item__draw--img"><img src="/media/<%= l.imagem %>" alt="" loading="lazy"></div><% } %>
+        <div class="pub-item__body">
+          <h3><%= tit %></h3>
+          <% if (l.tipo === 'vao') { %>
+          <dl class="pub-specs">
+            <% if (l.largura && l.altura) { %><div><dt>Medidas</dt><dd><%= l.largura %> × <%= l.altura %> mm (<%= u.num(D.area(l.largura, l.altura)) %> m²)</dd></div><% } %>
+            <div><dt>Abertura</dt><dd><%= D.descrever(l.desenho) %></dd></div>
+            <% if (l.serie) { %><div><dt>Sistema</dt><dd><%= l.serie %></dd></div><% } %>
+            <% if (l.cor) { %><div><dt>Cor</dt><dd><%= l.cor %></dd></div><% } %>
+            <% if (l.vidro) { %><div><dt>Vidro</dt><dd><%= l.vidro %></dd></div><% } %>
+          </dl>
+          <% } %>
+          <% if (l.detalhe) { %><p class="pub-detail"><%= l.detalhe %></p><% } %>
+        </div>
+        <div class="pub-item__val">
+          <span><%= u.num(l.quantidade) %> <%= l.unidade === 'un' ? (l.quantidade === 1 ? 'unidade' : 'unidades') : calculo.UNIDADES[l.unidade] %></span>
+          <% if (orc.mostrar_precos_linha) { %><strong><%= u.eur(l.total) %></strong><% if (l.quantidade !== 1) { %><small><%= u.eur(l.preco_unitario) %> / un.</small><% } %><% } %>
+        </div>
+      </article>
+      <% } %>
+    <% }) %>
+  </section>
+
+  <section class="pub-totals">
+    <dl>
+      <div><dt>Subtotal</dt><dd><%= u.eur(orc.subtotal) %></dd></div>
+      <% if (orc.desconto_valor > 0) { %><div><dt>Desconto (<%= u.num(orc.desconto_pct) %>%)</dt><dd>− <%= u.eur(orc.desconto_valor) %></dd></div><% } %>
+      <div><dt>IVA (<%= u.num(orc.iva_taxa) %>%)</dt><dd><%= u.eur(orc.iva_valor) %></dd></div>
+      <div class="pub-totals__total"><dt>Total</dt><dd><%= u.eur(orc.total) %></dd></div>
+    </dl>
+    <% if (orc.iva_motivo) { %><p class="small muted"><%= orc.iva_motivo %></p><% } %>
+  </section>
+
+  <% const cond = [['Prazo de execução', orc.cond_prazo], ['Pagamento', orc.cond_pagamento], ['Garantia', orc.cond_garantia], ['Incluído', orc.cond_incluido], ['Não incluído', orc.cond_excluido]].filter((c) => c[1]); %>
+  <% if (cond.length || orc.observacoes) { %>
+  <section class="pub-cond">
+    <h2 class="kicker">Condições</h2>
+    <dl><% cond.forEach(([k, v]) => { %><div><dt><%= k %></dt><dd><%= v %></dd></div><% }) %></dl>
+    <% if (orc.observacoes) { %><p class="pub-detail"><%= orc.observacoes %></p><% } %>
+  </section>
+  <% } %>
+
+  <% if (fotos.length) { %>
+  <section class="pub-photos">
+    <h2 class="kicker">Fotografias</h2>
+    <div><% fotos.forEach((f) => { %><figure><a href="/media/<%= f.filename %>" target="_blank" rel="noopener"><img src="/media/<%= f.filename %>" alt="<%= f.legenda %>" loading="lazy"></a><% if (f.legenda) { %><figcaption><%= f.legenda %></figcaption><% } %></figure><% }) %></div>
+  </section>
+  <% } %>
+
+  <section class="pub-actions" id="aceitar">
+    <a class="a-btn" href="/o/<%= orc.token %>/pdf" target="_blank" rel="noopener"><%- icon('download') %> Descarregar PDF</a>
+    <% if (podeAceitar && !preview) { %>
+    <form method="post" action="/o/<%= orc.token %>/aceitar" class="pub-accept">
+      <h2>Aceitar proposta</h2>
+      <label class="f"><span>Nome</span><input name="nome" required maxlength="200" value="<%= orc.cliente_nome %>" autocomplete="name"></label>
+      <label class="check"><input type="checkbox" name="confirmo" value="1" required> Aceito a proposta <%= orc.numero %> no valor de <%= u.eur(orc.total) %>, nas condições indicadas.</label>
+      <button class="a-btn a-btn--primary" type="submit"><%- icon('check') %> Aceitar proposta</button>
+    </form>
+    <% } %>
+  </section>
+
+  <footer class="pub-foot">
+    <img src="/static/brand/nuno-simbolo-claro.svg" alt="" width="32" height="38">
+    <div>
+      <strong><%= s.company_name %></strong>
+      <span><%= [s.address_line1, s.address_line2, s.postal_code].filter(Boolean).join(', ') %></span>
+      <span><% if (s.phone) { %><a href="tel:<%= s.phone.replace(/\s/g, '') %>"><%= s.phone %></a><% } %><% if (s.mobile) { %> · <a href="tel:<%= s.mobile.replace(/\s/g, '') %>"><%= s.mobile %></a><% } %><% if (s.email) { %> · <a href="mailto:<%= s.email %>"><%= s.email %></a><% } %></span>
+    </div>
+  </footer>
+</main>
+</body></html>

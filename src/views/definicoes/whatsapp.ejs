@@ -1,0 +1,51 @@
+<%- include('../partials/top') %>
+<% const st = estado.status; %>
+<header class="page-head">
+  <div><p class="kicker"><a href="/definicoes"><%- icon('arrowLeft', 'icon--sm') %> Definições</a></p><h1>WhatsApp</h1></div>
+</header>
+<div class="form-grid">
+  <section class="card" data-wa-status="<%= st %>">
+    <% if (!waOn) { %>
+      <h2 class="card__title">Envio manual</h2>
+      <p>Sem ponte configurada, o botão <strong>Enviar pelo meu WhatsApp</strong> abre o WhatsApp deste computador ou telemóvel com a mensagem e o link do orçamento prontos — basta carregar em enviar.</p>
+      <p class="mt-8">Para enviar <strong>automaticamente e com o PDF anexado</strong> a partir de um número da empresa, configure a ponte WAHA (como no Granivez hub):</p>
+      <ol class="steps">
+        <li>Acrescentar o serviço <code>whatsapp</code> (imagem <code>devlikeapro/waha</code>) — já incluído no <code>docker-compose.yml</code>.</li>
+        <li>Definir <code>WHATSAPP_API_URL</code> (ex.: <code>http://whatsapp:3000</code>) e <code>WHATSAPP_API_KEY</code>.</li>
+        <li>Reiniciar a aplicação e voltar a esta página para ligar o número com o código QR.</li>
+      </ol>
+    <% } else if (st === 'WORKING') { %>
+      <h2 class="card__title">Ligado</h2>
+      <p class="wa-ok"><%- icon('check') %> Número <strong><%= u.phonePretty(estado.numero) %></strong><%= estado.nome ? ' (' + estado.nome + ')' : '' %> pronto a enviar.</p>
+      <form method="post" action="/definicoes/whatsapp/desligar" data-confirm="Desligar este número da aplicação?" class="mt-16"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="a-btn a-btn--danger" type="submit">Desligar número</button></form>
+    <% } else if (st === 'SCAN_QR_CODE') { %>
+      <h2 class="card__title">Ler código QR</h2>
+      <p>No telemóvel da empresa: WhatsApp → <strong>Definições → Dispositivos ligados → Ligar um dispositivo</strong>, e aponte para o código.</p>
+      <img class="qr" src="/definicoes/whatsapp/qr.png?t=<%= Date.now() %>" alt="Código QR do WhatsApp" width="280" height="280" data-qr>
+      <p class="small muted">O código renova-se sozinho; esta página atualiza quando a ligação ficar feita.</p>
+    <% } else if (st === 'STARTING') { %>
+      <h2 class="card__title">A iniciar…</h2>
+      <p>A preparar a sessão. A página atualiza dentro de segundos.</p>
+    <% } else if (st === 'INDISPONIVEL') { %>
+      <h2 class="card__title">Ponte sem resposta</h2>
+      <div class="alert alert--error"><%= estado.erro %></div>
+      <p class="small muted">Confirme que o serviço <code>whatsapp</code> está a correr e que <code>WHATSAPP_API_URL</code>/<code>WHATSAPP_API_KEY</code> estão certos.</p>
+    <% } else { %>
+      <h2 class="card__title">Desligado</h2>
+      <p>Nenhum número ligado.</p>
+      <form method="post" action="/definicoes/whatsapp/ligar" class="mt-16"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="a-btn a-btn--primary" type="submit"><%- icon('whatsapp') %> Ligar número</button></form>
+    <% } %>
+  </section>
+  <aside class="form-side">
+    <section class="card">
+      <h2 class="card__title">Como é enviado</h2>
+      <ul class="bullets small">
+        <li>A mensagem segue o modelo em <a href="/definicoes#envio">Definições → Envio</a>.</li>
+        <li>Com “Anexar PDF” ativo, segue o PDF com a mensagem; se a ponte não aceitar ficheiros, vai só a mensagem com o link.</li>
+        <li>O número é confirmado antes de enviar (tem de ter WhatsApp).</li>
+        <li>Cada envio fica no histórico do orçamento.</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+<%- include('../partials/bottom', { scripts: ['js/whatsapp.js'] }) %>

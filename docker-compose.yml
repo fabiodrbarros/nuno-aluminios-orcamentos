@@ -1,0 +1,32 @@
+# Aplicação de orçamentos + ponte WhatsApp (opcional).
+services:
+  orcamentos:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      # Comentar estas duas linhas para não usar a ponte (envio manual pelo wa.me).
+      WHATSAPP_API_URL: http://whatsapp:3000
+      WHATSAPP_API_KEY: ${WAHA_API_KEY:-}
+    ports:
+      - "127.0.0.1:${APP_PORT:-3100}:3100"
+    volumes:
+      - orcamentos_data:/data
+
+  # Ponte WhatsApp (WAHA, motor NOWEB — sem browser, pouca memória). Sem portas para fora:
+  # só a app lhe fala, com a chave WAHA_API_KEY. O número liga-se lendo o QR code em Definições → WhatsApp.
+  whatsapp:
+    image: devlikeapro/waha:noweb
+    restart: unless-stopped
+    environment:
+      WHATSAPP_DEFAULT_ENGINE: NOWEB
+      WAHA_API_KEY: ${WAHA_API_KEY:-}
+      WAHA_PRINT_QR: "False"
+      WAHA_LOG_LEVEL: info
+    volumes:
+      - waha_sessions:/app/.sessions
+
+volumes:
+  orcamentos_data:
+  waha_sessions:

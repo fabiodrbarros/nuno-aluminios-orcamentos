@@ -1,0 +1,17 @@
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>Número</th><th>Cliente</th><th>Obra</th><th>Data</th><th>Estado</th><th class="num">Total</th></tr></thead>
+  <tbody>
+  <% orcs.forEach((o) => { const est = calculo.estadoVisivel(o, hoje); %>
+  <tr data-href="/orcamentos/<%= o.id %>">
+    <td><a class="strong" href="/orcamentos/<%= o.id %>"><%= o.numero %></a></td>
+    <td><%= o.cliente_nome || '—' %></td>
+    <td class="muted"><%= o.titulo || o.obra_local || '—' %><% if (o.n_vaos) { %> <span class="small">· <%= o.n_vaos %> <%= o.n_vaos === 1 ? 'vão' : 'vãos' %></span><% } %></td>
+    <td class="muted"><%= u.dataPt(o.data) %></td>
+    <td><span class="estado estado--<%= est %>"><%= calculo.ESTADOS[est] %></span><% if (o.visto_em && est === 'enviado') { %> <span class="small muted" title="Aberto pelo cliente em <%= u.dataHoraPt(o.visto_em) %>"><%- icon('eye', 'icon--sm inline') %></span><% } %></td>
+    <td class="num strong-num"><%= u.eur(o.total) %></td>
+  </tr>
+  <% }) %>
+  </tbody>
+</table>
+</div>

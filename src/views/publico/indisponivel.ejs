@@ -1,0 +1,8 @@
+<%- include('_head') %>
+<main class="pub-wrap pub-wrap--narrow">
+  <img class="pub-logo" src="/static/brand/nuno-horizontal-claro.svg" alt="NUNO Alumínios" width="1048" height="328">
+  <h1 class="pub-title">Orçamento indisponível</h1>
+  <p>O link não é válido ou o orçamento já não está disponível. Contacte-nos para receber uma nova cópia.</p>
+  <% if (settings.phone || settings.email) { %><p class="pub-contacts"><% if (settings.phone) { %><a href="tel:<%= settings.phone.replace(/\s/g, '') %>"><%= settings.phone %></a><% } %> <% if (settings.email) { %><a href="mailto:<%= settings.email %>"><%= settings.email %></a><% } %></p><% } %>
+</main>
+</body></html>

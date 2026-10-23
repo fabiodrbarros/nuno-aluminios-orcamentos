@@ -1,0 +1,60 @@
+<%- include('../partials/top') %>
+<% const a = artigo; const lay = desenho.parse(a.desenho || ''); %>
+<header class="page-head">
+  <div><p class="kicker"><a href="/artigos"><%- icon('arrowLeft', 'icon--sm') %> Artigos</a></p><h1><%= a.id ? a.nome : 'Novo artigo' %></h1></div>
+</header>
+<form method="post" action="<%= a.id ? '/artigos/' + a.id : '/artigos/novo' %>" enctype="multipart/form-data" class="form-grid" data-resize data-artigo-form>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div>
+    <section class="card">
+      <fieldset class="f seg">
+        <legend class="sr-only">Tipo</legend>
+        <label><input type="radio" name="tipo" value="vao" <%= a.tipo !== 'artigo' ? 'checked' : '' %>><span>Vão (com desenho e medidas)</span></label>
+        <label><input type="radio" name="tipo" value="artigo" <%= a.tipo === 'artigo' ? 'checked' : '' %>><span>Artigo ou serviço</span></label>
+      </fieldset>
+      <div class="grid-2">
+        <label class="f <%= erros.nome ? 'has-error' : '' %>"><span>Nome *</span><input name="nome" value="<%= a.nome || '' %>" required maxlength="200"><% if (erros.nome) { %><em><%= erros.nome %></em><% } %></label>
+        <label class="f"><span>Categoria</span><select name="categoria"><% Object.entries(CATEGORIAS).forEach(([k, v]) => { %><option value="<%= k %>" <%= a.categoria === k ? 'selected' : '' %>><%= v %></option><% }) %></select></label>
+      </div>
+      <label class="f"><span>Descrição <small>(texto que entra no orçamento)</small></span><textarea name="descricao" rows="2"><%= a.descricao || '' %></textarea></label>
+    </section>
+    <section class="card" data-only-vao>
+      <h2 class="card__title">Desenho e medidas habituais</h2>
+      <input type="hidden" name="desenho" value="<%= desenho.stringify(lay) %>" data-desenho-json>
+      <div class="art-draw">
+        <div class="art-draw__svg" data-desenho-preview><%- desenho.svg(lay, a.largura, a.altura) %></div>
+        <div>
+          <div class="grid-2">
+            <label class="f f--compact"><span>Largura (mm)</span><input name="largura" value="<%= a.largura || '' %>" inputmode="numeric" data-dim></label>
+            <label class="f f--compact"><span>Altura (mm)</span><input name="altura" value="<%= a.altura || '' %>" inputmode="numeric" data-dim></label>
+          </div>
+          <div data-folhas></div>
+          <label class="f f--compact"><span>Sistema</span><input name="serie" value="<%= a.serie || '' %>" list="lista-series-a" maxlength="120"></label>
+          <datalist id="lista-series-a"><% u.lines(settings.lista_series).forEach((x) => { %><option value="<%= x %>"><% }) %></datalist>
+        </div>
+      </div>
+    </section>
+  </div>
+  <aside class="form-side">
+    <section class="card">
+      <h2 class="card__title">Preço</h2>
+      <label class="f"><span>Unidade</span><select name="unidade" data-unidade><% Object.entries(UNIDADES).forEach(([k, v]) => { %><option value="<%= k %>" <%= a.unidade === k ? 'selected' : '' %>><%= v %></option><% }) %></select></label>
+      <label class="f"><span>Preço sem IVA (€)</span><input name="preco" value="<%= a.preco != null ? u.num(a.preco) : '' %>" inputmode="decimal"></label>
+      <label class="f" data-only-m2><span>Área mínima cobrada (m²)</span><input name="area_minima" value="<%= a.area_minima ? u.num(a.area_minima) : '' %>" inputmode="decimal" placeholder="0"></label>
+      <label class="switch"><input type="checkbox" name="ativo" value="1" <%= a.ativo ? 'checked' : '' %>><span></span>Ativo (aparece no editor)</label>
+    </section>
+    <section class="card">
+      <h2 class="card__title">Fotografia <small class="muted">(opcional)</small></h2>
+      <% if (a.imagem) { %><img class="art-img" src="/media/<%= a.imagem %>" alt=""><label class="check"><input type="checkbox" name="remover_imagem" value="1"> Remover fotografia</label><% } %>
+      <label class="dropzone mt-8"><input type="file" name="imagem" accept="image/*"><%- icon('upload') %><span>Escolher fotografia</span></label>
+      <p class="small muted mt-8">Nos vãos, o desenho técnico aparece sempre no PDF; a fotografia dos artigos simples (estores, acessórios) aparece ao lado da linha.</p>
+    </section>
+    <button class="a-btn a-btn--primary a-btn--block" type="submit"><%- icon('check') %> Guardar</button>
+    <% if (a.id) { %>
+    <button class="a-btn a-btn--danger a-btn--block mt-8" type="submit" form="apagar-art" ><%- icon('trash') %> Apagar artigo</button>
+    <% } %>
+  </aside>
+</form>
+<% if (a.id) { %><form id="apagar-art" method="post" action="/artigos/<%= a.id %>/apagar" data-confirm="Apagar este artigo? Os orçamentos já feitos não mudam."><input type="hidden" name="_csrf" value="<%= csrf %>"></form><% } %>
+<script type="application/json" id="tipos-data"><%- JSON.stringify(desenho.TIPOS) %></script>
+<%- include('../partials/bottom', { scripts: ['js/desenho.js', 'js/artigo.js'] }) %>

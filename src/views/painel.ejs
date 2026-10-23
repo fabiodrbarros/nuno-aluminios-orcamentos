@@ -1,0 +1,37 @@
+<%- include('partials/top') %>
+<header class="page-head">
+  <div><p class="kicker">Orçamentos · <%= ano %></p><h1>Painel</h1></div>
+  <div class="head-actions">
+    <a class="a-btn" href="/clientes/novo"><%- icon('users') %> Novo cliente</a>
+    <a class="a-btn a-btn--primary" href="/orcamentos/novo"><%- icon('plus') %> Novo orçamento</a>
+  </div>
+</header>
+<% if (!precosRevistos) { %>
+<div class="alert alert--warn alert--row">
+  <span>Os preços dos artigos são <strong>valores de exemplo</strong>. Reveja-os em <a href="/artigos">Artigos</a> antes de enviar orçamentos.</span>
+  <form method="post" action="/precos-revistos"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="a-btn a-btn--sm" type="submit">Já revi os preços</button></form>
+</div>
+<% } %>
+<section class="stats stats--4">
+  <a class="stat" href="/orcamentos?estado=rascunho"><span class="stat__n"><%= stats.rascunhos %></span><span>Rascunhos</span><small>por enviar</small></a>
+  <a class="stat" href="/orcamentos?estado=enviado"><span class="stat__n"><%= stats.abertos.n %></span><span>Em aberto</span><small><%= u.eur(stats.abertos.v) %> a aguardar resposta</small></a>
+  <a class="stat" href="/orcamentos?estado=aceite"><span class="stat__n"><%= stats.aceites.n %></span><span>Aceites em <%= ano %></span><small><%= u.eur(stats.aceites.v) %></small></a>
+  <a class="stat" href="/clientes"><span class="stat__n"><%= stats.taxa == null ? '—' : stats.taxa + '%' %></span><span>Taxa de aceitação</span><small><%= stats.clientes %> clientes</small></a>
+</section>
+<% if (stats.aExpirar.length) { %>
+<section class="card card--warn">
+  <div class="card__head"><h2>A expirar nos próximos 7 dias</h2></div>
+  <ul class="msg-list">
+    <% stats.aExpirar.forEach((o) => { %>
+    <li><a href="/orcamentos/<%= o.id %>"><strong><%= o.numero %></strong><span><%= o.cliente_nome || '—' %> · <%= u.eur(o.total) %></span><time>até <%= u.dataPt(calculo.validade(o)) %></time></a></li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>
+<section class="card card--flush">
+  <div class="card__head card__head--pad"><h2>Últimos orçamentos</h2><a href="/orcamentos">Ver todos</a></div>
+  <% if (!recentes.length) { %><p class="empty">Ainda não há orçamentos. <a href="/orcamentos/novo">Criar o primeiro</a>.</p><% } else { %>
+  <%- include('orcamentos/_tabela', { orcs: recentes }) %>
+  <% } %>
+</section>
+<%- include('partials/bottom') %>

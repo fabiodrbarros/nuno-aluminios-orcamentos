@@ -1,0 +1,7 @@
+  </main>
+</div>
+<script src="<%= asset('js/app.js') %>" defer></script>
+<% if (typeof scripts !== 'undefined') scripts.forEach((s) => { %><script src="<%= asset(s) %>" defer></script>
+<% }) %>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Entrar · Orçamentos NUNO Alumínios</title>
+<link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="<%= asset('css/app.css') %>">
+</head>
+<body class="admin admin--login">
+<main class="login">
+  <form class="login__card" method="post" action="/entrar">
+    <h1 class="sr-only">Orçamentos · NUNO Alumínios</h1>
+    <img class="login__logo login__logo--h" src="/static/brand/nuno-horizontal-claro.svg" alt="NUNO Alumínios" width="1048" height="328">
+    <img class="login__logo login__logo--w" src="/static/brand/nuno-wordmark-claro.svg" alt="NUNO Alumínios" width="636" height="197">
+    <p class="login__app">Orçamentos</p>
+    <% if (!enabled) { %>
+      <div class="alert alert--warn">Acesso desativado: defina <code>ADMIN_EMAIL</code> e <code>ADMIN_PASSWORD</code>.</div>
+    <% } %>
+    <% if (error) { %><div class="alert alert--error" role="alert"><%= error %></div><% } %>
+    <label class="f"><span class="sr-only">Email</span><input type="email" name="email" autocomplete="username" required value="<%= email %>" placeholder="Email" autofocus></label>
+    <label class="f"><span class="sr-only">Palavra-passe</span>
+      <span class="pw"><input type="password" name="password" autocomplete="current-password" required placeholder="Palavra-passe" data-pw><button type="button" class="pw__toggle" data-pw-toggle aria-label="Mostrar palavra-passe"><%- icon('eye') %></button></span>
+    </label>
+    <button class="a-btn a-btn--primary a-btn--block" type="submit">Entrar <%- icon('arrowRight') %></button>
+  </form>
+</main>
+<script src="<%= asset('js/app.js') %>" defer></script>
+</body>
+</html>

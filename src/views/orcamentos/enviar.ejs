@@ -1,0 +1,55 @@
+<%- include('../partials/top') %>
+<% const est = calculo.estadoVisivel(orc, hoje);
+   const waLigado = wa && wa.status === 'WORKING';
+   const mailto = 'mailto:' + encodeURIComponent(orc.cliente_email || '') + '?subject=' + encodeURIComponent('Orçamento ' + orc.numero + ' · Nuno Alumínios') + '&body=' + encodeURIComponent(mensagem.replace(/\*/g, '')); %>
+<header class="page-head">
+  <div><p class="kicker"><a href="/orcamentos/<%= orc.id %>"><%- icon('arrowLeft', 'icon--sm') %> <%= orc.numero %></a></p><h1>Enviar orçamento</h1></div>
+  <a class="a-btn" href="/orcamentos/<%= orc.id %>/pdf" target="_blank" rel="noopener"><%- icon('file') %> Ver PDF</a>
+</header>
+<% if (!nLinhas) { %><div class="alert alert--warn">Este orçamento ainda não tem trabalhos.</div><% } %>
+<% if (!publicUrlOk) { %><div class="alert alert--warn">O link usa o endereço atual (<code><%= link.replace(/\/o\/.*/, '') %></code>). Para os clientes o conseguirem abrir, defina <code>PUBLIC_URL</code> com o endereço público da aplicação.</div><% } %>
+<div class="form-grid">
+  <div>
+    <section class="card">
+      <div class="card__head"><h2>Mensagem</h2><span class="small muted">Para <%= orc.cliente_nome || 'cliente sem nome' %> · <%= u.eur(orc.total) %></span></div>
+      <form method="post" action="/orcamentos/<%= orc.id %>/enviar/whatsapp" id="wa-form">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <label class="f"><span>Telemóvel (WhatsApp)</span><input name="numero" id="wa-numero" type="tel" value="<%= numero %>" placeholder="+351 912 345 678" required></label>
+        <label class="f"><span>Texto</span><textarea name="mensagem" id="wa-msg" rows="8"><%= mensagem %></textarea></label>
+        <% if (waOn) { %>
+          <% if (waLigado) { %>
+          <button class="a-btn a-btn--primary a-btn--wa" type="submit" data-confirm="Enviar agora por WhatsApp?"><%- icon('whatsapp') %> Enviar por WhatsApp<%= settings.whatsapp_anexar_pdf === '1' ? ' (com PDF)' : '' %></button>
+          <p class="small muted mt-8">Enviado automaticamente pelo número <strong><%= u.phonePretty(wa.numero) %></strong>. O estado passa a “Enviado”.</p>
+          <% } else { %>
+          <div class="alert alert--warn">A ponte WhatsApp está configurada mas o número não está ligado. <a href="/definicoes/whatsapp">Ligar número</a></div>
+          <% } %>
+        <% } %>
+      </form>
+      <div class="send-alt">
+        <a class="a-btn<%= waOn && waLigado ? '' : ' a-btn--primary a-btn--wa' %>" href="#" data-wa-manual data-log="/orcamentos/<%= orc.id %>/enviar/manual"><%- icon('whatsapp') %> <%= waOn && waLigado ? 'Abrir no meu WhatsApp' : 'Enviar pelo meu WhatsApp' %></a>
+        <a class="a-btn" href="<%= mailto %>" data-mail data-log="/orcamentos/<%= orc.id %>/enviar/manual"><%- icon('mail') %> Email</a>
+      </div>
+      <% if (!waOn) { %><p class="small muted mt-8">Abre o WhatsApp (telemóvel ou computador) com a mensagem pronta e o link do orçamento; o PDF pode ser anexado à mão. Para envio automático com PDF, configure a ponte WhatsApp (ver README).</p><% } %>
+    </section>
+  </div>
+  <aside class="form-side">
+    <section class="card">
+      <h2 class="card__title">Link do cliente</h2>
+      <p class="small muted">O cliente vê o orçamento, descarrega o PDF e pode aceitá-lo online. Só fica acessível depois de marcado como enviado.</p>
+      <div class="copy-field"><input id="link" value="<%= link %>" readonly><button type="button" class="icon-btn" data-copy="#link" data-log="/orcamentos/<%= orc.id %>/enviar/manual" aria-label="Copiar link"><%- icon('copy') %></button></div>
+      <a class="a-btn a-btn--sm mt-8" href="<%= link %>" target="_blank" rel="noopener"><%- icon('external') %> Abrir como o cliente</a>
+      <% if (est === 'rascunho') { %>
+      <form method="post" action="/orcamentos/<%= orc.id %>/estado" class="mt-16"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="a-btn a-btn--sm a-btn--block" name="estado" value="enviado"><%- icon('check') %> Marcar como enviado</button></form>
+      <% } %>
+    </section>
+    <% if (envios.length) { %>
+    <section class="card">
+      <h2 class="card__title">Histórico</h2>
+      <ul class="log">
+        <% envios.forEach((e) => { %><li class="<%= e.ok ? '' : 'is-error' %>"><span><%= { whatsapp: 'WhatsApp', 'whatsapp-manual': 'WhatsApp (manual)', email: 'Email', link: 'Link copiado', 'aceite-online': 'Aceite online' }[e.canal] || e.canal %><%= e.destino ? ' · ' + e.destino : '' %></span><time><%= u.dataHoraPt(e.created_at) %></time><% if (e.detalhe) { %><small><%= e.detalhe %></small><% } %></li><% }) %>
+      </ul>
+    </section>
+    <% } %>
+  </aside>
+</div>
+<%- include('../partials/bottom', { scripts: ['js/enviar.js'] }) %>
